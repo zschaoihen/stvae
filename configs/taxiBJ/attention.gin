@@ -1,10 +1,10 @@
 # Base parameter
 main.base_path = './'
-main.run_number = 208
+main.run_number = 102
 main.exp_models = ["stVAE"]
 
 main.gammas = [1.6]
-main.seeds = [35]
+main.seeds = [42]
 
 # single_run.eval_metrics = ["effect"]
 single_run.eval_metrics = []
@@ -26,13 +26,14 @@ conv3x3.norm = 'InstanceNorm2d'
 TemporalConvLayer.num_channels = 4
 
 encoder = @shared_encoder/singleton
-shared_encoder/singleton.constructor = @RevisedStEncoder
-RevisedStEncoder.temporal_module = @TemporalConvLayer
-RevisedStEncoder.conv3x3 = %casual_conv
-RevisedStEncoder.image_out_size = [2, 2]
-RevisedStEncoder.image_out_channel = 4
-RevisedStEncoder.output_size = 16
-RevisedStEncoder.image_encoder = @ImageEncoder
+shared_encoder/singleton.constructor = @AttentionStEncoder
+AttentionStEncoder.temporal_module = @TemporalConvLayer
+AttentionStEncoder.conv3x3 = %casual_conv
+AttentionStEncoder.image_out_size = [2, 2]
+AttentionStEncoder.image_out_channel = 4
+AttentionStEncoder.output_size = 16
+AttentionStEncoder.num_heads = 4
+AttentionStEncoder.image_encoder = @ImageEncoder
 
 ImageDecoder.input_size = 8
 ImageDecoder.n_channels = 2
@@ -84,7 +85,8 @@ StVAE_network.encoder = %encoder
 StVAE_network.decoder = %decoder
 
 # Dataset
-dset_dir = '/home/sichen/Desktop/research/Separate_factors/data/processed/taxiBJ/'
+dset_dir = 'D:/Separate_factors/data/processed/taxiBJ/'
+# dset_dir = '/home/sichen/Desktop/research/Separate_factors/data/processed/taxiBJ/'
 dset_name = 'TaxiBJ_st'
 
 get_loader.dset_dir = %dset_dir

@@ -1,6 +1,6 @@
 # Base parameter
 main.base_path = './'
-main.run_number = 102
+main.run_number = 205
 main.exp_models = ["stVAE"]
 
 main.gammas = [1.6]
@@ -26,14 +26,13 @@ conv3x3.norm = 'InstanceNorm2d'
 TemporalConvLayer.num_channels = 4
 
 encoder = @shared_encoder/singleton
-shared_encoder/singleton.constructor = @AttentionStEncoder
-AttentionStEncoder.temporal_module = @TemporalConvLayer
-AttentionStEncoder.conv3x3 = %casual_conv
-AttentionStEncoder.image_out_size = [2, 2]
-AttentionStEncoder.image_out_channel = 4
-AttentionStEncoder.output_size = 16
-AttentionStEncoder.num_heads = 4
-AttentionStEncoder.image_encoder = @ImageEncoder
+shared_encoder/singleton.constructor = @RevisedStEncoder
+RevisedStEncoder.temporal_module = @TemporalConvLayer
+RevisedStEncoder.conv3x3 = %casual_conv
+RevisedStEncoder.image_out_size = [2, 2]
+RevisedStEncoder.image_out_channel = 4
+RevisedStEncoder.output_size = 16
+RevisedStEncoder.image_encoder = @ImageEncoder
 
 ImageDecoder.input_size = 8
 ImageDecoder.n_channels = 2
@@ -73,11 +72,11 @@ StVAESolver.VAE = @StVAE_network
 StVAESolver.D = @BaseDiscriminator
 
 StVAESolver.gamma = 0
-StVAESolver.lr_VAE = 0.0001
+StVAESolver.lr_VAE = 0.0005
 StVAESolver.beta1_VAE = 0.9
 StVAESolver.beta2_VAE = 0.99
 
-StVAESolver.lr_D = 0.0005
+StVAESolver.lr_D = 0.0001
 StVAESolver.beta1_D = 0.5
 StVAESolver.beta2_D = 0.9
 
@@ -86,7 +85,6 @@ StVAE_network.decoder = %decoder
 
 # Dataset
 dset_dir = 'D:/Separate_factors/data/processed/taxiBJ/'
-# dset_dir = '/home/sichen/Desktop/research/Separate_factors/data/processed/taxiBJ/'
 dset_name = 'TaxiBJ_st'
 
 get_loader.dset_dir = %dset_dir
