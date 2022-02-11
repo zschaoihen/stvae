@@ -1,0 +1,94 @@
+# Base parameter
+main.base_path = './'
+main.run_number = 100
+main.exp_models = ["stVAE"]
+
+main.gammas = [0.4]
+main.seeds = [35]
+
+# single_run.eval_metrics = ["effect"]
+single_run.eval_metrics = []
+single_run.mode = ['spatio_temporal', 'revised']
+
+#  Model setting
+ImageEncoder_modified.n_channels = 2
+ImageEncoder_modified.output_size = 2
+ImageEncoder_modified.ngf = 4
+ImageEncoder_modified.n_layers = 3
+ImageEncoder_modified.norm = 'InstanceNorm2d'
+
+casual_conv = @shared_conv3x3/singleton
+shared_conv3x3/singleton.constructor = @conv3x3
+conv3x3.num_channels = 2
+conv3x3.kernel_size = 3
+conv3x3.norm = 'InstanceNorm2d'
+
+TemporalConvLayer.num_channels = 2
+
+encoder = @shared_encoder/singleton
+shared_encoder/singleton.constructor = @RevisedStEncoder
+RevisedStEncoder.temporal_module = @TemporalConvLayer
+RevisedStEncoder.conv3x3 = %casual_conv
+RevisedStEncoder.image_out_size = [1, 6]
+RevisedStEncoder.image_out_channel = 2
+RevisedStEncoder.output_size = 12
+RevisedStEncoder.image_encoder = @ImageEncoder_modified
+
+ImageDecoder_modified.input_size = 4
+ImageDecoder_modified.n_channels = 2
+ImageDecoder_modified.ngf = 4
+ImageDecoder_modified.n_layers = 3
+ImageDecoder_modified.norm = 'None'
+
+decoder = @shared_decoder/singleton
+shared_decoder/singleton.constructor = @StDecoder
+StDecoder.spatial_channel = 2
+StDecoder.image_in_size = [1, 6]
+StDecoder.temporal_channel = 2
+StDecoder.image_decoder = @ImageDecoder_modified
+
+BaseDiscriminator.layer_dim_list = [144, 500, 500, 500, 2]
+BaseDiscriminator.activation = 'LeakyReLU'
+BaseDiscriminator.act_param = [0.2, 1]
+
+BaseSolver.use_cuda = True
+BaseSolver.max_iter = 10000
+BaseSolver.print_iter = 100
+BaseSolver.batch_size = 128
+
+mutual_information.n_data = 21336
+
+StVAESolver.log_flag = True
+# StVAESolver.log_flag = False
+
+StVAESolver.ckpt_load  = False
+# StVAESolver.ckpt_load  = True
+
+StVAESolver.ckpt_save_iter  = 200 
+StVAESolver.ckptname = -1
+StVAESolver.print_iter = 100
+
+StVAESolver.VAE = @StVAE_network
+StVAESolver.D = @BaseDiscriminator
+
+StVAESolver.gamma = 1.6
+StVAESolver.lr_VAE = 0.0005
+StVAESolver.beta1_VAE = 0.9
+StVAESolver.beta2_VAE = 0.99
+
+StVAESolver.lr_D = 0.0001
+StVAESolver.beta1_D = 0.5
+StVAESolver.beta2_D = 0.9
+
+StVAE_network.encoder = %encoder
+StVAE_network.decoder = %decoder
+
+# Dataset
+dset_dir = '/home/sichen/Desktop/research/Separate_factors/data/processed/taxiNYC/'
+dset_name = 'TaxiNYC_st'
+
+get_loader.dset_dir = %dset_dir
+get_loader.dset_name = %dset_name
+get_loader.batch_size = 128
+get_loader.num_workers = 1
+
